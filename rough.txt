@@ -1,0 +1,20 @@
+AI/ML Engineer
+
+About the Role
+We're looking for an AI/ML Engineer to help build and scale our machine learning systems, from research to production.
+
+Responsibilities
+- Design and train deep learning models for computer vision and/or NLP tasks
+- Run comparative experiments and benchmark model performance against existing baselines
+- Work closely with the engineering team to move models from research to production
+- Document findings and present results to both technical and non-technical stakeholders
+- Stay current with the latest research and apply relevant techniques to ongoing projects
+
+Requirements
+- Strong programming skills in Python
+- Hands-on experience with PyTorch or TensorFlow
+- Background in computer vision, NLP, or image processing
+- Experience with Scikit-learn, OpenCV, or similar libraries
+- Prior exposure to research work, publications, or benchmarking studies is a plus
+- Excellent communication skills and ability to work in a collaborative team environment
+- M.Tech/B.Tech in Computer Science, AI, or related field
