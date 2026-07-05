@@ -22,8 +22,9 @@ with col1:
     uploaded_resume = st.file_uploader(
         "Upload your resume",
         type=["pdf", "docx"],
-        help="PDF or DOCX only",
+        help="PDF or DOCX only. Must be a text-based file (not a scanned image or photo) so the text can be read.",
     )
+    st.caption("📌 Tip: If your resume is a scanned copy or photo, please use a text-based PDF/DOCX export instead.")
 
 with col2:
     jd_text = st.text_area(
@@ -58,6 +59,10 @@ if analyze_clicked:
                 st.progress(min(int(score_pct), 100))
             else:
                 st.info("Match score unavailable.")
+
+            # Show a prominent warning if the AI analysis portion failed entirely
+            if result["error"] and not result["matched_technical_skills"] and not result["missing_technical_skills"] and not result["suggestions"]:
+                st.warning(f"⚠️ {result['error']}")
 
             st.divider()
 
@@ -109,10 +114,6 @@ if analyze_clicked:
                     st.markdown(f"{i}. {suggestion}")
             else:
                 st.info("No suggestions available.")
-
-            # Show non-fatal errors (e.g., LLM partially failed but score worked)
-            if result["error"]:
-                st.caption(f"⚠️ Note: {result['error']}")
             
             # Eligibility verdict
             verdict = result.get("eligibility_verdict")

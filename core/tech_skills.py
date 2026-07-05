@@ -36,6 +36,7 @@ Respond with ONLY a valid JSON array of strings, nothing else. Example format:
         model=MODEL,
         messages=[{"role": "user", "content": prompt}],
         temperature=0.1,
+        timeout=30,
     )
 
     raw_output = response.choices[0].message.content.strip()

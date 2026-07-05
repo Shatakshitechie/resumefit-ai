@@ -54,7 +54,7 @@ Respond with ONLY a valid JSON object (no other text, no markdown formatting) in
 Rules:
 - Use the ALREADY-CONFIRMED technical skills list above when reasoning about 
   suggestions and the verdict - do not contradict it or re-decide it
-- - suggestions: UP TO 5 improvements. EVERY suggestion MUST explicitly name a 
+- suggestions: UP TO 5 improvements. EVERY suggestion MUST explicitly name a 
   specific project, role, or detail from THIS resume (e.g., name the actual 
   project title, company, or achievement mentioned in the resume) and propose 
   a concrete rewording or addition. Generic advice with no specific resume 
@@ -79,6 +79,7 @@ Rules:
         model=MODEL,
         messages=[{"role": "user", "content": prompt}],
         temperature=0.3,
+        timeout=30,
     )
 
     raw_output = response.choices[0].message.content.strip()
@@ -101,3 +102,43 @@ Rules:
         }
 
     return result
+
+
+def is_resume_like(resume_text: str) -> dict:
+    """
+    Quick check to see if the uploaded document actually looks like a resume/CV,
+    before running the full analysis pipeline on it.
+    """
+    prompt = f"""Look at the following document text and determine if it is a 
+resume/CV (a document describing a person's education, work experience, 
+skills, and/or projects for job applications).
+
+DOCUMENT TEXT:
+{resume_text[:2000]}
+
+Respond with ONLY a valid JSON object, nothing else:
+{{
+  "is_resume": true or false,
+  "reason": "brief one-sentence explanation"
+}}
+"""
+
+    response = client.chat.completions.create(
+        model=MODEL,
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.1,
+        timeout=30,
+    )
+
+    raw_output = response.choices[0].message.content.strip()
+
+    if raw_output.startswith("```"):
+        raw_output = raw_output.strip("`")
+        if raw_output.startswith("json"):
+            raw_output = raw_output[4:].strip()
+
+    try:
+        result = json.loads(raw_output)
+        return result
+    except json.JSONDecodeError:
+        return {"is_resume": True, "reason": "Could not verify, proceeding anyway."}
