@@ -2,6 +2,8 @@ from core.extract import extract_resume_text
 from core.scoring import compute_match_score
 from core.analyze import analyze_resume_vs_jd, is_resume_like
 from core.tech_skills import analyze_technical_skills
+from core.analyze import analyze_resume_vs_jd, is_resume_like, is_job_description_like
+
 
 def _friendly_error(exception) -> str:
     """
@@ -96,6 +98,15 @@ def run_full_analysis(uploaded_resume_file, jd_text: str) -> dict:
         result["success"] = False
         result["error"] = "Job description is too short or empty. Please paste a full JD."
         return result
+
+    try:
+        jd_check = is_job_description_like(jd_text)
+        if not jd_check.get("is_valid_jd", True):
+            result["success"] = False
+            result["error"] = f"This doesn't look like a complete job description: {jd_check.get('reason', '')}"
+            return result
+    except Exception as e:
+        result["error"] = f"(JD-type check skipped: {_friendly_error(e)})"
 
     # Step 3: Compute match score (embeddings) - independent of LLM
     try:

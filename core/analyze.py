@@ -13,6 +13,47 @@ client = OpenAI(
 MODEL = "openrouter/free"
 
 
+def is_job_description_like(jd_text: str) -> dict:
+    """
+    Checks if the pasted text contains enough concrete information to be
+    treated as a real job description (not just vague/casual text).
+    """
+    prompt = f"""Look at the following text and determine if it contains 
+enough concrete, specific information to be treated as a real job description 
+(e.g., mentions specific skills, technologies, responsibilities, or 
+requirements) - not just vague, generic statements.
+
+TEXT:
+{jd_text[:1500]}
+
+Respond with ONLY a valid JSON object, nothing else:
+{{
+  "is_valid_jd": true or false,
+  "reason": "brief one-sentence explanation"
+}}
+"""
+
+    response = client.chat.completions.create(
+        model=MODEL,
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.1,
+        timeout=30,
+    )
+
+    raw_output = response.choices[0].message.content.strip()
+
+    if raw_output.startswith("```"):
+        raw_output = raw_output.strip("`")
+        if raw_output.startswith("json"):
+            raw_output = raw_output[4:].strip()
+
+    try:
+        result = json.loads(raw_output)
+        return result
+    except json.JSONDecodeError:
+        return {"is_valid_jd": True, "reason": "Could not verify, proceeding anyway."}
+
+
 def analyze_resume_vs_jd(resume_text: str, jd_text: str, matched_technical: list, missing_technical: list) -> dict:
     """
     Handles soft skills (via inference), suggestions, and eligibility verdict.
