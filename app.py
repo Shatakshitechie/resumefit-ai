@@ -16,7 +16,7 @@ st.markdown(
 st.divider()
 
 # --- Rate limiting setup ---
-MAX_ANALYSES_PER_SESSION = 2
+MAX_ANALYSES_PER_SESSION = 10
 
 if "analysis_count" not in st.session_state:
     st.session_state.analysis_count = 0
@@ -24,7 +24,7 @@ if "last_result" not in st.session_state:
     st.session_state.last_result = None
 
 # --- Input section ---
-col1, col2 = st.columns(2)
+col1, col2 = st.columns([2, 3])
 
 with col1:
     uploaded_resume = st.file_uploader(
@@ -40,11 +40,11 @@ with col2:
         height=200,
         placeholder="Paste the full job description here...",
     )
-
 analyze_clicked = st.button("Analyze", type="primary", use_container_width=True)
 
 remaining = MAX_ANALYSES_PER_SESSION - st.session_state.analysis_count
-st.caption(f"🔎 {remaining} analysis{'es' if remaining != 1 else ''} remaining this session")
+unit = "analysis" if remaining == 1 else "analyses"
+st.caption(f"🔎 {remaining} {unit} remaining this session")
 
 st.divider()
 
